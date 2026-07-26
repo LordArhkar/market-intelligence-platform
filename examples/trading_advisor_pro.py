@@ -39,7 +39,8 @@ US_STOCKS = ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "NVDA", "TSLA", "AMD", "NF
 CRYPTO = ["BTC-USD", "ETH-USD", "SOL-USD", "DOGE-USD", "XRP-USD"]
 
 # Timeframes to analyze (more = slower but more accurate)
-TIMEFRAMES = ["15m", "30m", "1h", "4h", "1d", "1wk"]
+# Note: 15m/30m only go back 7 days, 1h goes back 30 days
+TIMEFRAMES = ["1h", "4h", "1d", "1wk"]
 
 # =====================================
 # CANDLESTICK PATTERNS (50+ patterns)
@@ -511,22 +512,24 @@ class TradingAdvisorPro:
         self.timeframes = TIMEFRAMES
         self.candle_data = {}
         
-    def fetch_data(self, timeframe: str, period: str = "2mo") -> List[Candle]:
+    def fetch_data(self, timeframe: str) -> List[Candle]:
         """Fetch data for a specific timeframe."""
         try:
             ticker = yf.Ticker(self.symbol)
             
-            # Map timeframe to yfinance interval
+            # Map timeframe to yfinance interval and period
+            # Yahoo Finance limits: 15m/30m = 7 days, 1h = 30 days, 4h = 60 days, 1d/1wk = max
             interval_map = {
-                "15m": "15m",
-                "30m": "30m", 
-                "1h": "1h",
-                "4h": "4h",
-                "1d": "1d",
-                "1wk": "1wk",
+                "15m": ("5m", "7d"),
+                "30m": ("30m", "7d"),
+                "1h": ("1h", "30d"),
+                "4h": ("4h", "60d"),
+                "1d": ("1d", "2y"),
+                "1wk": ("1wk", "5y"),
             }
             
-            hist = ticker.history(period=period, interval=interval_map.get(timeframe, "1d"))
+            interval, period = interval_map.get(timeframe, ("1d", "2y"))
+            hist = ticker.history(period=period, interval=interval)
             
             if hist.empty:
                 return []
