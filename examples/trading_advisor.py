@@ -40,38 +40,18 @@ async def analyze_stock(connector: YahooFinanceConnector, symbol: str) -> dict:
     }
     
     try:
-        request = MarketDataRequest(
-            symbol=symbol,
-            start_date=datetime.utcnow(),
-            end_date=datetime.utcnow(),
-            timeframe="1d",
-        )
-        data = await connector.get_price_bars(request)
-        
-        if data is None or data.is_empty():
-            return result
-        
-        # Get current price
-        result["current_price"] = data["close"][-1]
-        if len(data) > 1:
-            result["change_pct"] = ((data["close"][-1] / data["close"][-2]) - 1) * 100
-        
-        # Get historical for strategies
-        hist_request = MarketDataRequest(
-            symbol=symbol,
-            start_date=datetime.utcnow(),
-            end_date=datetime.utcnow(),
-            timeframe="1d",
-        )
-        hist_data = await connector.get_price_bars(hist_request)
-        
-        # Fetch more history
+        # Fetch historical data using yfinance directly (more reliable)
         import yfinance as yf
         ticker = yf.Ticker(symbol)
         hist = ticker.history(period="6mo")
         
-        if len(hist) < 30:
+        if hist is None or len(hist) < 30:
             return result
+        
+        # Get current price from last available bar
+        result["current_price"] = float(hist["Close"].iloc[-1])
+        if len(hist) > 1:
+            result["change_pct"] = ((hist["Close"].iloc[-1] / hist["Close"].iloc[-2]) - 1) * 100
         
         # Convert to polars
         import polars as pl
@@ -132,18 +112,32 @@ async def analyze_crypto(connector: CCXTConnector, symbol: str) -> dict:
     }
     
     try:
-        data = await connector.get_ohlcv(symbol, "1d", limit=180)
+        # Use yfinance for crypto (more reliable than CCXT sometimes)
+        import yfinance as yf
         
-        if data is None or len(data) == 0:
+        # Convert BTC/USDT to BTC-USD for yfinance
+        yf_symbol = symbol.replace("/USDT", "-USD").replace("/", "-")
+        
+        ticker = yf.Ticker(yf_symbol)
+        hist = ticker.history(period="6mo")
+        
+        if hist is None or len(hist) < 30:
             return result
         
-        import polars as pl
-        df = pl.DataFrame(data)
-        df.columns = ["timestamp", "open", "high", "low", "close", "volume"]
+        result["current_price"] = float(hist["Close"].iloc[-1])
+        if len(hist) > 1:
+            result["change_pct"] = ((hist["Close"].iloc[-1] / hist["Close"].iloc[-2]) - 1) * 100
         
-        result["current_price"] = df["close"][-1]
-        if len(df) > 1:
-            result["change_pct"] = ((df["close"][-1] / df["close"][-2]) - 1) * 100
+        # Convert to polars
+        import polars as pl
+        df = pl.DataFrame({
+            "timestamp": hist.index.tolist(),
+            "open": hist["Open"].tolist(),
+            "high": hist["High"].tolist(),
+            "low": hist["Low"].tolist(),
+            "close": hist["Close"].tolist(),
+            "volume": hist["Volume"].tolist(),
+        })
         
         context = {
             "symbol": symbol,
