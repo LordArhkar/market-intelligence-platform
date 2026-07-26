@@ -87,6 +87,8 @@ python -m mip.dashboard.app
 - `MomentumStrategy`: Cross-sectional momentum based on RSI and price momentum
 - `MeanReversionStrategy`: Bollinger Bands mean reversion
 - `TrendFollowingStrategy`: Multi-MA trend following with ADX confirmation
+- `BreakoutStrategy`: Support/resistance breakouts with volume confirmation
+- `VolatilityStrategy`: Bollinger Band width expansion signals
 
 ### Risk Management
 
