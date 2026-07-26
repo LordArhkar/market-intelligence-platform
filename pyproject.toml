@@ -58,7 +58,7 @@ dependencies = [
     
     # Technical analysis
     "ta>=0.10.0",
-    "pandas-ta>=0.3.0",
+    # Note: pandas-ta removed - requires numba which doesn't support Python 3.14
     "vectorbt>=0.25.0",
     
     # Configuration
