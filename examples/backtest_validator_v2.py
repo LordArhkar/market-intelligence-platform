@@ -21,7 +21,54 @@ import yfinance as yf
 import numpy as np
 
 sys.path.insert(0, str(__file__).rsplit('/', 2)[0])
-from examples.trading_advisor_v2 import CandlestickPatterns, TechnicalAnalysis, Candle
+from examples.trading_advisor_v2 import CandlestickPatterns, Candle
+import sys
+import numpy as np
+
+class SimpleTA:
+    """Simple technical analysis without ADX complexity."""
+    
+    @staticmethod
+    def calculate_rsi(prices, period=14):
+        if len(prices) < period + 1:
+            return 50.0
+        deltas = np.diff(prices)
+        gains = np.where(deltas > 0, deltas, 0)
+        losses = np.where(deltas < 0, -deltas, 0)
+        avg_gain = np.mean(gains[-period:])
+        avg_loss = np.mean(losses[-period:])
+        if avg_loss == 0:
+            return 100.0
+        rs = avg_gain / avg_loss
+        return 100 - (100 / (1 + rs))
+    
+    @staticmethod
+    def calculate_atr(candles, period=14):
+        if len(candles) < period + 1:
+            return 0
+        true_ranges = []
+        for i in range(1, len(candles)):
+            tr = max(
+                candles[i].high - candles[i].low,
+                abs(candles[i].high - candles[i-1].close),
+                abs(candles[i].low - candles[i-1].close)
+            )
+            true_ranges.append(tr)
+        return np.mean(true_ranges[-period:])
+    
+    @staticmethod
+    def detect_regime(candles):
+        if len(candles) < 50:
+            return "UNKNOWN"
+        prices = [c.close for c in candles]
+        returns = np.diff(prices) / np.array(prices[:-1])
+        volatility = float(np.std(returns[-20:]) * 100)
+        if volatility > 2.5:
+            return "VOLATILE"
+        elif volatility > 1.5:
+            return "TREND"
+        else:
+            return "RANGE"
 
 
 def fetch_historical_data(symbol: str, days: int = 365) -> List[Candle]:
@@ -53,9 +100,9 @@ def generate_improved_signals(candles: List[Candle]) -> List[Dict]:
         prices = [c.close for c in current_candles]
         
         # Calculate indicators
-        rsi = TechnicalAnalysis.calculate_rsi(prices)
-        atr = TechnicalAnalysis.calculate_atr(current_candles)
-        regime = TechnicalAnalysis.detect_regime(current_candles[-50:]) if len(current_candles) >= 50 else "UNKNOWN"
+        rsi = SimpleTA.calculate_rsi(prices)
+        atr = SimpleTA.calculate_atr(current_candles)
+        regime = SimpleTA.detect_regime(current_candles[-50:]) if len(current_candles) >= 50 else "UNKNOWN"
         
         # Detect patterns
         patterns = CandlestickPatterns.detect_all_patterns(current_candles)

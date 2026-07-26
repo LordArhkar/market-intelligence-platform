@@ -238,7 +238,6 @@ class TechnicalAnalysis:
         
         highs = [c.high for c in candles]
         lows = [c.low for c in candles]
-        closes = [c.close for c in candles]
         
         plus_dm = []
         minus_dm = []
@@ -250,20 +249,27 @@ class TechnicalAnalysis:
             if high_diff > low_diff and high_diff > 0:
                 plus_dm.append(high_diff)
             else:
-                plus_dm.append(0)
+                plus_dm.append(0.0)
             
             if low_diff > high_diff and low_diff > 0:
                 minus_dm.append(low_diff)
             else:
-                minus_dm.append(0)
+                minus_dm.append(0.0)
         
-        plus_di = 100 * np.mean(plus_dm[-period:]) / (TechnicalAnalysis.calculate_atr(candles, period) + 0.0001)
-        minus_di = 100 * np.mean(minus_dm[-period:]) / (TechnicalAnalysis.calculate_atr(candles, period) + 0.0001)
+        atr = TechnicalAnalysis.calculate_atr(candles, period)
+        if atr == 0:
+            return 25.0
+        
+        plus_di = 100 * np.mean(plus_dm[-period:]) / atr
+        minus_di = 100 * np.mean(minus_dm[-period:]) / atr
         
         dx = 100 * abs(plus_di - minus_di) / (plus_di + minus_di + 0.0001)
-        adx = np.mean(dx[-period:]) if len(dx) >= period else 25
         
-        return adx
+        # Store dx values for smoothing
+        adx_values = [dx]
+        adx = np.mean(adx_values[-period:]) if len(adx_values) >= period else dx
+        
+        return float(adx)
     
     @staticmethod
     def detect_regime(candles: List[Candle]) -> str:
@@ -277,8 +283,8 @@ class TechnicalAnalysis:
         adx = TechnicalAnalysis.calculate_adx(candles[-50:])
         
         # Calculate volatility
-        returns = np.diff(prices) / prices[:-1]
-        volatility = np.std(returns[-20:]) * 100
+        returns = np.diff(prices) / np.array(prices[:-1])
+        volatility = float(np.std(returns[-20:]) * 100)
         
         if adx > 25:
             return "TREND"
