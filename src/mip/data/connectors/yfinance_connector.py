@@ -109,17 +109,25 @@ class YahooFinanceConnector(DataConnector):
         # Convert to Polars
         df = pl.from_pandas(hist.reset_index())
         
-        # Rename columns to lowercase
-        column_mapping = {
-            "Datetime": "timestamp",
-            "Date": "timestamp",
-            "Open": "open",
-            "High": "high",
-            "Low": "low",
-            "Close": "close",
-            "Volume": "volume",
-        }
-        df = df.rename(column_mapping)
+        # Rename columns to lowercase - handle different possible names
+        column_mapping = {}
+        for col in df.columns:
+            col_lower = col.lower()
+            if col_lower in ["datetime", "date"]:
+                column_mapping[col] = "timestamp"
+            elif col_lower in ["open", "high", "low", "close", "volume"]:
+                column_mapping[col] = col_lower
+        
+        if column_mapping:
+            df = df.rename(column_mapping)
+        
+        # Ensure timestamp column exists
+        if "timestamp" not in df.columns:
+            # Try to find datetime-like column
+            for col in df.columns:
+                if "datetime" in col.lower() or "date" in col.lower():
+                    df = df.rename({col: "timestamp"})
+                    break
         
         # Ensure timestamp is datetime
         if "timestamp" in df.columns:

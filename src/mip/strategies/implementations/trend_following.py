@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Any
 
 import polars as pl
-from ta.trend import EMA, SMA, MACD, ADXIndicator
+from ta.trend import MACD, ADXIndicator, EMAIndicator as EMA, SMAIndicator as SMA
 from ta.momentum import RSIIndicator
 from ta.volatility import AverageTrueRange
 

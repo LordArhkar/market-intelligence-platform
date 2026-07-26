@@ -10,7 +10,8 @@ from typing import Any
 
 import polars as pl
 from ta.momentum import RSIIndicator, StochasticOscillator
-from ta.trend import MACD, SMA
+from ta.trend import MACD
+from ta.trend import SMAIndicator as SMA
 
 from mip.core.models.signal import Signal, SignalDirection, SignalStatus, SignalType
 from mip.strategies.base import BaseStrategy, StrategyResult
