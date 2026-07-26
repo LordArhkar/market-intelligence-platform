@@ -7,6 +7,15 @@ Use these as ideas for manual trading on UpsideOnly.com
 
 DISCLAIMER: This is research/education only. Not financial advice.
 Past performance does not guarantee future results.
+
+====================================
+CUSTOMIZATION OPTIONS (Edit below):
+====================================
+1. CONFIDENCE_THRESHOLD - Minimum confidence to show (0-100)
+   Lower = more signals, higher = stricter signals
+2. US_STOCKS - List of stock symbols to analyze
+3. CRYPTO - List of crypto pairs to analyze
+====================================
 """
 
 import asyncio
@@ -24,9 +33,24 @@ from mip.strategies.implementations import (
 )
 
 
-# Trading symbols - edit this list to add/remove symbols
-US_STOCKS = ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "NVDA", "TSLA", "AMD", "NFLX", "SPY"]
-CRYPTO = ["BTC/USDT", "ETH/USDT", "SOL/USDT", "DOGE/USDT", "XRP/USDT"]
+# =====================================
+# CUSTOMIZATION OPTIONS - EDIT THESE:
+# =====================================
+
+# Minimum confidence to show (0-100)
+# 40 = Shows most signals (default)
+# 50 = Only medium-high confidence
+# 60 = Only high confidence
+# 70 = Only very high confidence
+CONFIDENCE_THRESHOLD = 40
+
+# Stock symbols to analyze (add/remove as needed)
+US_STOCKS = ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "NVDA", "TSLA", "AMD", "NFLX", "SPY", "QQQ", "IWM"]
+
+# Crypto pairs to analyze
+CRYPTO = ["BTC/USDT", "ETH/USDT", "SOL/USDT", "DOGE/USDT", "XRP/USDT", "ADA/USDT", "AVAX/USDT"]
+
+# =====================================
 
 
 async def analyze_stock(connector: YahooFinanceConnector, symbol: str) -> dict:
@@ -245,89 +269,89 @@ async def main():
     # ============ SUMMARY ============
     print("\n" + "=" * 70)
     print("📋 TRADING RECOMMENDATIONS SUMMARY")
+    print(f"   (Showing signals with confidence ≥ {CONFIDENCE_THRESHOLD}%)")
     print("=" * 70)
     
     if all_recommendations:
         # Sort by confidence
         all_recommendations.sort(key=lambda x: x["confidence"], reverse=True)
         
-        # Filter high confidence
-        high_conf = [r for r in all_recommendations if r["confidence"] >= 50]
+        # Filter by threshold
+        filtered_signals = [r for r in all_recommendations if r["confidence"] >= CONFIDENCE_THRESHOLD]
         
-        if high_conf:
-            print("\n🎯 HIGH CONFIDENCE SIGNALS (≥50%):")
+        if filtered_signals:
+            print("\n🎯 ACTIONABLE SIGNALS:")
             print("-" * 70)
             
+            # Detailed trade cards
+            for i, rec in enumerate(filtered_signals[:10], 1):
+                direction = "🟢 BUY (LONG)" if rec["direction"] == "LONG" else "🔴 SELL (SHORT)"
+                risk = (rec.get("stop") and rec.get("entry")) and abs((rec["stop"] - rec["entry"]) / rec["entry"]) * 100 if rec.get("entry") else 0
+                reward = (rec.get("target") and rec.get("entry")) and abs((rec["target"] - rec["entry"]) / rec["entry"]) * 100 if rec.get("entry") else 0
+                
+                print(f"\n{'─' * 70}")
+                print(f"  #{i} {rec['symbol']} - {direction}")
+                print(f"  {'─' * 70}")
+                print(f"  📊 Confidence: {rec['confidence']:.0f}% ({rec['strategy']})")
+                print(f"  💰 Entry Price: ${rec['entry']:.2f}" if rec.get("entry") else f"  💰 Entry: MARKET PRICE")
+                print(f"  🛑 Stop Loss: ${rec['stop']:.2f}" if rec.get("stop") else f"  🛑 Stop Loss: SET YOUR OWN")
+                print(f"  🎯 Take Profit: ${rec['target']:.2f}" if rec.get("target") else f"  🎯 Take Profit: SET YOUR OWN")
+                if risk > 0 and reward > 0:
+                    print(f"  ⚖️  Risk/Reward: {risk:.1f}% / {reward:.1f}% (RR: 1:{reward/risk:.1f})")
+                if rec.get("evidence"):
+                    print(f"  📝 Why: {rec['evidence'][0]}")
+                
+                # UpsideOnly entry template
+                print(f"\n  📋 UPSIDEONLY ENTRY:")
+                print(f"     Direction: {'LONG' if rec['direction'] == 'LONG' else 'SHORT'}")
+                print(f"     Entry: ${rec['entry']:.2f}" if rec.get("entry") else f"     Entry: MARKET")
+                print(f"     Stop: ${rec['stop']:.2f}" if rec.get("stop") else f"     Stop: ___")
+                print(f"     Target: ${rec['target']:.2f}" if rec.get("target") else f"     Target: ___")
+            
+            # Summary table
+            print(f"\n{'─' * 70}")
+            print("\n📊 QUICK REFERENCE TABLE:")
+            print("-" * 70)
             table_data = []
-            for rec in high_conf:
-                stop_str = f"${rec['stop']:.2f}" if rec.get("stop") else "N/A"
-                target_str = f"${rec['target']:.2f}" if rec.get("target") else "N/A"
+            for rec in filtered_signals[:10]:
+                direction = "🟢 LONG" if rec["direction"] == "LONG" else "🔴 SHORT"
+                entry_str = f"${rec['entry']:.2f}" if rec.get("entry") else "Market"
+                stop_str = f"${rec['stop']:.2f}" if rec.get("stop") else "---"
+                target_str = f"${rec['target']:.2f}" if rec.get("target") else "---"
                 table_data.append([
                     rec["symbol"],
-                    rec["direction"],
+                    direction,
                     f"{rec['confidence']:.0f}%",
-                    f"${rec['entry']:.2f}" if rec.get("entry") else "Market",
+                    entry_str,
                     stop_str,
                     target_str,
-                    rec["strategy"],
                 ])
             
             print(tabulate(
                 table_data,
-                headers=["Symbol", "Direction", "Confidence", "Entry", "Stop Loss", "Target", "Strategy"],
+                headers=["Symbol", "Direction", "Conf", "Entry", "Stop", "Target"],
                 tablefmt="grid"
             ))
-            
-            print("\n📝 HOW TO USE FOR UPSIDEONLY:")
-            print("-" * 70)
-            for rec in high_conf[:5]:
-                direction = "BUY" if rec["direction"] == "LONG" else "SELL"
-                print(f"\n{rec['symbol']}:")
-                print(f"  → Action: {direction}")
-                print(f"  → Entry: ${rec['entry']:.2f}" if rec.get("entry") else "  → Entry: Market price")
-                print(f"  → Stop Loss: ${rec['stop']:.2f}" if rec.get("stop") else "  → Stop Loss: Set your own")
-                print(f"  → Take Profit: ${rec['target']:.2f}" if rec.get("target") else "  → Take Profit: Set your own")
-                print(f"  → Confidence: {rec['confidence']:.0f}% ({rec['strategy']})")
-                if rec.get("evidence"):
-                    print(f"  → Why: {rec['evidence'][0]}")
         else:
-            print("\n⚠️ No high-confidence signals found.")
-            print("   Market conditions don't favor clear entry points.")
-    
-    # All signals
-    print("\n" + "=" * 70)
-    print("📊 ALL SIGNALS (Lower Confidence)")
-    print("=" * 70)
-    
-    if all_recommendations:
-        low_conf = [r for r in all_recommendations if r["confidence"] < 50]
-        if low_conf:
-            table_data = []
-            for rec in low_conf:
-                table_data.append([
-                    rec["symbol"],
-                    rec["direction"],
-                    f"{rec['confidence']:.0f}%",
-                    rec["strategy"],
-                ])
-            
-            print(tabulate(
-                table_data,
-                headers=["Symbol", "Direction", "Confidence", "Strategy"],
-                tablefmt="simple"
-            ))
-            print("\n💡 These signals have lower confidence - consider as ideas only")
+            print("\n⚠️ No signals meet the confidence threshold.")
+            print(f"   Current threshold: {CONFIDENCE_THRESHOLD}%")
+            print("   To see more signals, lower CONFIDENCE_THRESHOLD in the code")
+    else:
+        print("\n⚠️ No signals generated.")
+        print("   Try lowering CONFIDENCE_THRESHOLD or adding more symbols")
     
     # Stats
-    longs = sum(1 for r in all_recommendations)
-    shorts = sum(1 for r in all_recommendations)
+    longs = sum(1 for r in all_recommendations if r['direction'] == 'LONG')
+    shorts = sum(1 for r in all_recommendations if r['direction'] == 'SHORT')
     
     print("\n" + "=" * 70)
     print("📈 MARKET OVERVIEW")
     print("=" * 70)
-    print(f"  Total Signals: {len(all_recommendations)}")
-    print(f"  Bullish (LONG): {sum(1 for r in all_recommendations if r['direction'] == 'LONG')}")
-    print(f"  Bearish (SHORT): {sum(1 for r in all_recommendations if r['direction'] == 'SHORT')}")
+    print(f"  Total Signals Found: {len(all_recommendations)}")
+    print(f"  Showing (≥{CONFIDENCE_THRESHOLD}%): {len([r for r in all_recommendations if r['confidence'] >= CONFIDENCE_THRESHOLD])}")
+    print(f"  Bullish (LONG): {longs}")
+    print(f"  Bearish (SHORT): {shorts}")
+    print(f"  Avg Confidence: {sum(r['confidence'] for r in all_recommendations)/len(all_recommendations):.0f}%" if all_recommendations else "  N/A")
     
     print("\n" + "=" * 70)
     print("⚠️ IMPORTANT REMINDERS")
@@ -339,6 +363,9 @@ async def main():
 4. Only trade what you can afford to lose
 5. The $1,000,000 goal is NOT guaranteed
 6. UpsideOnly paper trading uses virtual money - no real risk here
+
+📌 TO GET UPDATES: Run 'python examples/trading_advisor.py' daily or
+   set up a cron job/scheduled task on your computer
     """)
 
 
