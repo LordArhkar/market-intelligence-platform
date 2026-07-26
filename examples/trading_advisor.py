@@ -38,11 +38,11 @@ from mip.strategies.implementations import (
 # =====================================
 
 # Minimum confidence to show (0-100)
-# 40 = Shows most signals (default)
-# 50 = Only medium-high confidence
-# 60 = Only high confidence
-# 70 = Only very high confidence
-CONFIDENCE_THRESHOLD = 40
+# 40 = Shows most signals 
+# 50 = Balanced (RECOMMENDED - default)
+# 60 = High confidence only
+# 70 = Very strict signals
+CONFIDENCE_THRESHOLD = 50
 
 # Stock symbols to analyze (add/remove as needed)
 US_STOCKS = ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "NVDA", "TSLA", "AMD", "NFLX", "SPY", "QQQ", "IWM"]
@@ -95,12 +95,34 @@ async def analyze_stock(connector: YahooFinanceConnector, symbol: str) -> dict:
             "regime": "TREND",
         }
         
+        # Optimized strategies for stocks - slightly more sensitive
         strategies = [
-            ("Momentum", MomentumStrategy()),
-            ("Mean Reversion", MeanReversionStrategy()),
-            ("Trend Following", TrendFollowingStrategy()),
-            ("Breakout", BreakoutStrategy()),
-            ("Volatility", VolatilityStrategy()),
+            ("Momentum", MomentumStrategy(
+                lookback_period=15,
+                rsi_oversold=35,
+                rsi_overbought=65,
+                min_momentum=0.015,
+            )),
+            ("Mean Reversion", MeanReversionStrategy(
+                bb_period=18,
+                bb_std=1.8,
+            )),
+            ("Trend Following", TrendFollowingStrategy(
+                fast_ma=8,
+                slow_ma=30,
+                trend_ma=100,
+                adx_threshold=20,
+            )),
+            ("Breakout", BreakoutStrategy(
+                lookback_period=15,
+                volume_multiplier=1.3,
+                min_breakout_pct=0.3,
+            )),
+            ("Volatility", VolatilityStrategy(
+                bb_period=18,
+                bb_std=2.0,
+                min_width_pct=2.5,
+            )),
         ]
         
         for name, strategy in strategies:
@@ -136,7 +158,7 @@ async def analyze_crypto(connector: CCXTConnector, symbol: str) -> dict:
     }
     
     try:
-        # Use yfinance for crypto (more reliable than CCXT sometimes)
+        # Use yfinance for crypto
         import yfinance as yf
         
         # Convert BTC/USDT to BTC-USD for yfinance
@@ -170,12 +192,33 @@ async def analyze_crypto(connector: CCXTConnector, symbol: str) -> dict:
             "regime": "TREND",
         }
         
+        # Crypto-optimized strategies with adjusted parameters
         strategies = [
-            ("Momentum", MomentumStrategy()),
-            ("Mean Reversion", MeanReversionStrategy()),
-            ("Trend Following", TrendFollowingStrategy()),
-            ("Breakout", BreakoutStrategy()),
-            ("Volatility", VolatilityStrategy()),
+            # Momentum - adjusted for crypto volatility
+            ("Momentum", MomentumStrategy(
+                lookback_period=14,  # Shorter for faster signals
+                rsi_oversold=35,     # More lenient for crypto
+                rsi_overbought=65,
+                min_momentum=0.02,   # Lower threshold
+            )),
+            # Trend Following - shorter MAs for crypto
+            ("Trend Following", TrendFollowingStrategy(
+                fast_ma=7,
+                slow_ma=21,
+                trend_ma=50,
+                adx_threshold=20,
+            )),
+            # Breakout - wider bands for crypto
+            ("Breakout", BreakoutStrategy(
+                lookback_period=14,
+                volume_multiplier=1.2,
+                min_breakout_pct=0.3,
+            )),
+            # Volatility - adjusted for crypto
+            ("Volatility", VolatilityStrategy(
+                bb_period=15,
+                bb_std=2.5,
+            )),
         ]
         
         for name, strategy in strategies:
@@ -184,10 +227,12 @@ async def analyze_crypto(connector: CCXTConnector, symbol: str) -> dict:
             if sig_result.signals:
                 signal = sig_result.signals[0]
                 if signal.direction.value != "NEUTRAL":
+                    # Boost crypto confidence slightly
+                    boosted_confidence = min(signal.confidence + 5, 95)
                     result["recommendations"].append({
                         "strategy": name,
                         "direction": signal.direction.value,
-                        "confidence": signal.confidence,
+                        "confidence": boosted_confidence,
                         "entry": signal.entry_price,
                         "stop": signal.stop_loss,
                         "target": signal.take_profit_1,
