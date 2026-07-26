@@ -558,10 +558,19 @@ class TradingAdvisorPro:
         if len(candles) < 30:
             return {"error": "Insufficient data"}
         
+        # Calculate 24h change properly
+        change_pct = 0
+        if len(candles) >= 2:
+            # Get 24h ago candle (or closest available)
+            current = candles[-1].close
+            # For daily data, get yesterday's close
+            prev_day_close = candles[-2].close if len(candles) >= 2 else current
+            change_pct = ((current - prev_day_close) / prev_day_close * 100) if prev_day_close != 0 else 0
+        
         analysis = {
             "timeframe": timeframe,
             "current_price": candles[-1].close,
-            "change_pct": ((candles[-1].close - candles[0].close) / candles[0].close) * 100,
+            "change_pct": change_pct,
             "patterns": {},
             "traps": {},
             "indicators": {},
@@ -660,9 +669,12 @@ class TradingAdvisorPro:
             confidence = min((bearish_score / total_score) * 100, 95)
         
         # Get entry levels from daily timeframe
-        daily = all_analysis.get("1d", {})
+        daily = all_analysis.get("1d", all_analysis.get("1h", {}))
         current = daily.get("current_price", 0)
         atr = daily.get("indicators", {}).get("atr", current * 0.02)
+        
+        # Get proper 24h change from daily data
+        daily_24h_change = all_analysis.get("1d", {}).get("change_pct", 0) if "1d" in all_analysis else 0
         
         if direction == "LONG":
             entry = current
@@ -685,6 +697,7 @@ class TradingAdvisorPro:
             "bullish_score": bullish_score,
             "bearish_score": bearish_score,
             "analysis": all_analysis,
+            "change_24h": daily_24h_change,
         }
 
 
@@ -700,7 +713,7 @@ async def analyze_symbol(symbol: str) -> dict:
     result = advisor.generate_signal()
     
     if result["direction"] != "NEUTRAL":
-        change = result.get("analysis", {}).get("1d", {}).get("change_pct", 0)
+        change = result.get("change_24h", 0)
         emoji = "🟢" if result["direction"] == "LONG" else "🔴"
         print(f"   {emoji} {result['direction']} - Confidence: {result['confidence']:.0f}%")
         print(f"   📈 24h Change: {change:+.2f}%")
