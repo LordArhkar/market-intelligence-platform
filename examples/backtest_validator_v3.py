@@ -15,6 +15,7 @@ Usage:
 """
 
 import argparse
+from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Dict, Tuple
 import yfinance as yf
@@ -28,8 +29,6 @@ class Candle:
     low: float
     close: float
     volume: float
-
-from dataclasses import dataclass
 
 
 class TechnicalAnalysis:
