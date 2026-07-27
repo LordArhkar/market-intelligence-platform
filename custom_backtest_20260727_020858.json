@@ -1,0 +1,529 @@
+{
+  "results": [
+    {
+      "symbol": "AMZN",
+      "trades": 31,
+      "win_rate": 19.35483870967742,
+      "total_pnl": -35.284084680053894,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "AAPL",
+      "trades": 33,
+      "win_rate": 24.242424242424242,
+      "total_pnl": 21.78921494883908,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "META",
+      "trades": 46,
+      "win_rate": 19.565217391304348,
+      "total_pnl": -32.618062763861474,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "NVDA",
+      "trades": 40,
+      "win_rate": 37.5,
+      "total_pnl": 114.4888278579144,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "TSLA",
+      "trades": 51,
+      "win_rate": 41.17647058823529,
+      "total_pnl": 368.96005586404164,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "AUDUSD=X",
+      "trades": 92,
+      "win_rate": 26.08695652173913,
+      "total_pnl": -29.037000099716302,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "GBPUSD=X",
+      "trades": 94,
+      "win_rate": 25.53191489361702,
+      "total_pnl": -20.338059317282852,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "EURUSD=X",
+      "trades": 105,
+      "win_rate": 40.0,
+      "total_pnl": 5.958012851099018,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "USDJPY=X",
+      "trades": 105,
+      "win_rate": 24.761904761904763,
+      "total_pnl": 8.666080764020617,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "USDCHF=X",
+      "trades": 74,
+      "win_rate": 37.83783783783784,
+      "total_pnl": 9.687008669782552,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "GC=F",
+      "trades": 104,
+      "win_rate": 9.615384615384617,
+      "total_pnl": -187.66183533840646,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "SI=F",
+      "trades": 130,
+      "win_rate": 13.846153846153847,
+      "total_pnl": -366.5039206073733,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "CL=F",
+      "trades": 87,
+      "win_rate": 37.93103448275862,
+      "total_pnl": 170.57352110968907,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "^DJI",
+      "trades": 6,
+      "win_rate": 50.0,
+      "total_pnl": 5.029994956644572,
+      "validation": "MARGINAL"
+    },
+    {
+      "symbol": "^N225",
+      "trades": 15,
+      "win_rate": 26.666666666666668,
+      "total_pnl": -18.521883563172132,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "^FTSE",
+      "trades": 17,
+      "win_rate": 52.94117647058824,
+      "total_pnl": 12.139113217591175,
+      "validation": "MARGINAL"
+    },
+    {
+      "symbol": "MSFT",
+      "trades": 33,
+      "win_rate": 18.181818181818183,
+      "total_pnl": -60.09822403221878,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "GOOGL",
+      "trades": 43,
+      "win_rate": 41.86046511627907,
+      "total_pnl": 164.6514895648555,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "GOOG",
+      "trades": 42,
+      "win_rate": 38.095238095238095,
+      "total_pnl": 105.82398756824006,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "AVGO",
+      "trades": 37,
+      "win_rate": 48.64864864864865,
+      "total_pnl": 265.60675151494877,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "ADBE",
+      "trades": 28,
+      "win_rate": 0.0,
+      "total_pnl": -199.52700200208022,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "CSCO",
+      "trades": 35,
+      "win_rate": 45.714285714285715,
+      "total_pnl": 140.4459256686699,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "ACN",
+      "trades": 27,
+      "win_rate": 29.629629629629626,
+      "total_pnl": 29.376467452188837,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "IBM",
+      "trades": 35,
+      "win_rate": 48.57142857142857,
+      "total_pnl": 77.34908181919225,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "ORCL",
+      "trades": 52,
+      "win_rate": 30.76923076923077,
+      "total_pnl": 158.29857360131447,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "INTC",
+      "trades": 78,
+      "win_rate": 30.76923076923077,
+      "total_pnl": 272.0821056452198,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "AMD",
+      "trades": 41,
+      "win_rate": 41.46341463414634,
+      "total_pnl": 269.3184990629365,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "QCOM",
+      "trades": 33,
+      "win_rate": 12.121212121212121,
+      "total_pnl": -177.07201806879405,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "TXN",
+      "trades": 39,
+      "win_rate": 35.8974358974359,
+      "total_pnl": 131.53938265478453,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "NOW",
+      "trades": 41,
+      "win_rate": 21.951219512195124,
+      "total_pnl": -117.09687812349637,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "INTU",
+      "trades": 23,
+      "win_rate": 8.695652173913043,
+      "total_pnl": -87.53440087290127,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "AMAT",
+      "trades": 44,
+      "win_rate": 38.63636363636363,
+      "total_pnl": 287.66079853646534,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "LRCX",
+      "trades": 53,
+      "win_rate": 35.84905660377358,
+      "total_pnl": 256.81668177782933,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "MU",
+      "trades": 55,
+      "win_rate": 43.63636363636363,
+      "total_pnl": 545.0802114708533,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "KLAC",
+      "trades": 44,
+      "win_rate": 47.72727272727273,
+      "total_pnl": 324.1310327356144,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "SNPS",
+      "trades": 33,
+      "win_rate": 6.0606060606060606,
+      "total_pnl": -158.27574069312854,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "CDNS",
+      "trades": 26,
+      "win_rate": 0.0,
+      "total_pnl": -197.57826198420474,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "PANW",
+      "trades": 30,
+      "win_rate": 3.3333333333333335,
+      "total_pnl": -164.29554338485693,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "CRWD",
+      "trades": 33,
+      "win_rate": 51.515151515151516,
+      "total_pnl": 268.4688762935042,
+      "validation": "MARGINAL"
+    },
+    {
+      "symbol": "FTNT",
+      "trades": 23,
+      "win_rate": 17.391304347826086,
+      "total_pnl": -43.29051870456979,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "NET",
+      "trades": 32,
+      "win_rate": 68.75,
+      "total_pnl": 496.969964169992,
+      "validation": "PASS"
+    },
+    {
+      "symbol": "HD",
+      "trades": 34,
+      "win_rate": 20.588235294117645,
+      "total_pnl": -33.77195149775997,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "MCD",
+      "trades": 32,
+      "win_rate": 21.875,
+      "total_pnl": 4.891348726076377,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "NKE",
+      "trades": 38,
+      "win_rate": 23.684210526315788,
+      "total_pnl": 14.67192959248748,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "SBUX",
+      "trades": 37,
+      "win_rate": 13.513513513513514,
+      "total_pnl": -101.12809816826237,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "LOW",
+      "trades": 41,
+      "win_rate": 17.073170731707318,
+      "total_pnl": -64.06787204161935,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "TJX",
+      "trades": 29,
+      "win_rate": 24.137931034482758,
+      "total_pnl": -8.014595918004991,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "BKNG",
+      "trades": 30,
+      "win_rate": 20.0,
+      "total_pnl": -51.56494333354526,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "CMG",
+      "trades": 35,
+      "win_rate": 0.0,
+      "total_pnl": -238.48364241986997,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "MAR",
+      "trades": 34,
+      "win_rate": 52.94117647058824,
+      "total_pnl": 174.78478169446066,
+      "validation": "MARGINAL"
+    },
+    {
+      "symbol": "HLT",
+      "trades": 26,
+      "win_rate": 38.46153846153847,
+      "total_pnl": 58.48335156622417,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "RCL",
+      "trades": 45,
+      "win_rate": 51.11111111111111,
+      "total_pnl": 300.1067012887737,
+      "validation": "MARGINAL"
+    },
+    {
+      "symbol": "CCL",
+      "trades": 40,
+      "win_rate": 37.5,
+      "total_pnl": 221.71689200302254,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "EBAY",
+      "trades": 58,
+      "win_rate": 46.55172413793103,
+      "total_pnl": 383.4957691578707,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "YUM",
+      "trades": 41,
+      "win_rate": 0.0,
+      "total_pnl": -198.59848068994526,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "JPM",
+      "trades": 30,
+      "win_rate": 26.666666666666668,
+      "total_pnl": 4.63417825419762,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "BAC",
+      "trades": 28,
+      "win_rate": 25.0,
+      "total_pnl": 1.8711286972383592,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "WFC",
+      "trades": 25,
+      "win_rate": 28.000000000000004,
+      "total_pnl": 12.521890436834934,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "GS",
+      "trades": 32,
+      "win_rate": 34.375,
+      "total_pnl": 66.91588332241214,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "MS",
+      "trades": 33,
+      "win_rate": 42.42424242424242,
+      "total_pnl": 98.21579943055139,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "C",
+      "trades": 26,
+      "win_rate": 73.07692307692307,
+      "total_pnl": 302.334505272488,
+      "validation": "PASS"
+    },
+    {
+      "symbol": "UNH",
+      "trades": 27,
+      "win_rate": 33.33333333333333,
+      "total_pnl": 59.26761380558237,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "JNJ",
+      "trades": 17,
+      "win_rate": 23.52941176470588,
+      "total_pnl": -1.866091586559374,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "LLY",
+      "trades": 17,
+      "win_rate": 35.294117647058826,
+      "total_pnl": 56.028875193992874,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "PFE",
+      "trades": 39,
+      "win_rate": 12.82051282051282,
+      "total_pnl": -114.1656248611254,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "ABBV",
+      "trades": 57,
+      "win_rate": 36.84210526315789,
+      "total_pnl": 148.00418827448752,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "MRK",
+      "trades": 24,
+      "win_rate": 37.5,
+      "total_pnl": 95.87520438291976,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "TMO",
+      "trades": 25,
+      "win_rate": 24.0,
+      "total_pnl": 30.032212877100154,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "XOM",
+      "trades": 36,
+      "win_rate": 44.44444444444444,
+      "total_pnl": 120.44701009090669,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "CVX",
+      "trades": 35,
+      "win_rate": 37.142857142857146,
+      "total_pnl": 109.8899643098144,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "CAT",
+      "trades": 38,
+      "win_rate": 50.0,
+      "total_pnl": 243.91068905850355,
+      "validation": "MARGINAL"
+    },
+    {
+      "symbol": "BA",
+      "trades": 38,
+      "win_rate": 10.526315789473683,
+      "total_pnl": -158.99962020139128,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "HON",
+      "trades": 33,
+      "win_rate": 27.27272727272727,
+      "total_pnl": 9.856169973353305,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "GE",
+      "trades": 27,
+      "win_rate": 25.925925925925924,
+      "total_pnl": 2.3578756910409644,
+      "validation": "FAIL"
+    },
+    {
+      "symbol": "PL=F",
+      "trades": 131,
+      "win_rate": 27.480916030534353,
+      "total_pnl": -31.557510395753056,
+      "validation": "FAIL"
+    }
+  ]
+}
