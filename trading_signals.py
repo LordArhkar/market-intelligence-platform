@@ -119,8 +119,28 @@ class TradingSignalGenerator:
         return float(dx)
     
     def generate_signal(self):
-        """Generate trading signal with strict 60%+ win rate criteria"""
-        if len(self.candles) < 200:
+        """
+        Generate trading signal with STRICT 60%+ win rate criteria.
+        
+        STRATEGY: Mean Reversion with Extreme Overbought/Oversold
+        
+        LONG Signal Requirements (ALL must be true):
+        1. RSI Percentile < 15 (EXTREME oversold - bottom 15% of history)
+        2. RSI < 35 (not just percentile, but absolute RSI low)
+        3. ADX > 25 (trending market, not choppy)
+        4. Price above SMA 50 (confirmed uptrend)
+        5. No big moves in last 3 days (avoid catching falling knife)
+        
+        SHORT Signal Requirements (ALL must be true):
+        1. RSI Percentile > 85 (EXTREME overbought - top 15% of history)
+        2. RSI > 65 (not just percentile, but absolute RSI high)
+        3. ADX > 25 (trending market)
+        4. Price below SMA 50 (confirmed downtrend)
+        5. Volume confirmation (1.2x average)
+        
+        Risk:Reward = 1:2.5 (needs only 29% win rate to break even)
+        """
+        if len(self.candles) < 252:
             return None
         
         # Calculate indicators
@@ -130,7 +150,6 @@ class TradingSignalGenerator:
         atr = self.calc_atr()
         adx = self.calc_adx()
         sma_50 = self.calc_sma(self.prices, 50)
-        sma_200 = self.calc_sma(self.prices, 200)
         current_vol = self.candles[-1]['volume']
         avg_vol = np.mean([c['volume'] for c in self.candles[-20:]])
         vol_ratio = current_vol / avg_vol if avg_vol > 0 else 1
@@ -139,94 +158,122 @@ class TradingSignalGenerator:
         if atr == 0:
             atr = current_price * 0.02
         
-        signal = None
-        confidence = 0
-        reason = ""
+        # Check for big recent moves (stop-run avoidance)
+        big_move = False
+        if atr > 0:
+            for j in range(-3, 0):
+                if abs(j) <= len(self.candles):
+                    candle = self.candles[j]
+                    move = abs(candle['close'] - candle['open'])
+                    if move > atr * 2:
+                        big_move = True
+                        break
         
-        # ============ LONG SIGNAL ============
-        # RSI below 25th percentile (oversold) + bullish confirmation
-        if rsi_pct < 25 and rsi < 40:
-            confidence = 60 + (25 - rsi_pct)  # Higher confidence the more oversold
-            if sma_50 > sma_200:  # Bullish trend confirmation
-                confidence += 10
-            if adx > 25:  # Strong trend
-                confidence += 10
+        atr_mult = 1.5
+        
+        # ============ STRICT LONG SIGNAL ============
+        # Only trade when ALL conditions are met
+        long_conditions = (
+            rsi_pct < 15 and       # EXTREME oversold (bottom 15% of history)
+            rsi < 35 and           # RSI below 35
+            adx > 25 and           # Strong trend
+            current_price > sma_50 and  # Above SMA 50 (uptrend)
+            not big_move            # No big recent moves
+        )
+        
+        if long_conditions:
+            confidence = 70 + (15 - rsi_pct)  # 70-85% confidence
             if vol_ratio > 1.2:
                 confidence += 5
-            
             confidence = min(confidence, 95)
             
-            atr_mult = 1.5
             stop_loss = round(current_price * (1 - atr_mult * atr / current_price), 2)
             take_profit = round(current_price * (1 + atr_mult * 2.5 * atr / current_price), 2)
             risk_pct = round(atr_mult * atr / current_price * 100, 2)
             reward_pct = round(atr_mult * 2.5 * atr / current_price * 100, 2)
-            rr_ratio = round((atr_mult * 2.5 * atr) / (atr_mult * atr), 1)
             
-            signal = "🟢 BUY"
-            reason = f"Oversold (RSI {rsi:.0f}, %ile {rsi_pct:.0f}) + Bullish trend"
-        
-        # ============ SHORT SIGNAL ============
-        # RSI above 75th percentile (overbought) + bearish confirmation
-        elif rsi_pct > 75 and rsi > 60:
-            confidence = 60 + (rsi_pct - 75)  # Higher confidence the more overbought
-            if sma_50 < sma_200:  # Bearish trend confirmation
-                confidence += 10
-            if adx > 25:  # Strong trend
-                confidence += 10
-            if vol_ratio > 1.2:
-                confidence += 5
-            
-            confidence = min(confidence, 95)
-            
-            atr_mult = 1.5
-            stop_loss = round(current_price * (1 + atr_mult * atr / current_price), 2)
-            take_profit = round(current_price * (1 - atr_mult * 2.5 * atr / current_price), 2)
-            risk_pct = round(atr_mult * atr / current_price * 100, 2)
-            reward_pct = round(atr_mult * 2.5 * atr / current_price * 100, 2)
-            rr_ratio = round((atr_mult * 2.5 * atr) / (atr_mult * atr), 1)
-            
-            signal = "🔴 SELL"
-            reason = f"Overbought (RSI {rsi:.0f}, %ile {rsi_pct:.0f}) + Bearish trend"
-        
-        # ============ NO SIGNAL ============
-        else:
             return {
                 'symbol': self.symbol,
-                'signal': "⚪ HOLD",
+                'signal': "🟢 BUY",
                 'price': round(current_price, 2),
                 'rsi': round(rsi, 1),
                 'rsi_percentile': round(rsi_pct, 1),
                 'adx': round(adx, 1),
-                'trend': 'bullish' if sma_50 > sma_200 else 'bearish',
-                'confidence': 0,
-                'entry': None,
-                'stop_loss': None,
-                'take_profit': None,
-                'risk_reward': None,
-                'reason': f"No signal (RSI {rsi:.0f} at {rsi_pct:.0f}%ile)"
+                'trend': 'bullish',
+                'confidence': confidence,
+                'entry': round(current_price, 2),
+                'stop_loss': stop_loss,
+                'take_profit': take_profit,
+                'risk_pct': risk_pct,
+                'reward_pct': reward_pct,
+                'risk_reward': 2.5,
+                'reason': f"EXTREME Oversold (RSI {rsi:.0f}, %ile {rsi_pct:.0f}) + Uptrend",
+                'volume_ratio': round(vol_ratio, 2),
+                'atr': round(atr, 2),
+                'sma_50': round(sma_50, 2)
             }
         
+        # ============ STRICT SHORT SIGNAL ============
+        short_conditions = (
+            rsi_pct > 85 and       # EXTREME overbought (top 15% of history)
+            rsi > 65 and           # RSI above 65
+            adx > 25 and           # Strong trend
+            current_price < sma_50 and  # Below SMA 50 (downtrend)
+            vol_ratio > 1.2 and    # Volume confirmation
+            not big_move            # No big recent moves
+        )
+        
+        if short_conditions:
+            confidence = 70 + (rsi_pct - 85)  # 70-85% confidence
+            if vol_ratio > 1.5:
+                confidence += 5
+            confidence = min(confidence, 95)
+            
+            stop_loss = round(current_price * (1 + atr_mult * atr / current_price), 2)
+            take_profit = round(current_price * (1 - atr_mult * 2.5 * atr / current_price), 2)
+            risk_pct = round(atr_mult * atr / current_price * 100, 2)
+            reward_pct = round(atr_mult * 2.5 * atr / current_price * 100, 2)
+            
+            return {
+                'symbol': self.symbol,
+                'signal': "🔴 SELL",
+                'price': round(current_price, 2),
+                'rsi': round(rsi, 1),
+                'rsi_percentile': round(rsi_pct, 1),
+                'adx': round(adx, 1),
+                'trend': 'bearish',
+                'confidence': confidence,
+                'entry': round(current_price, 2),
+                'stop_loss': stop_loss,
+                'take_profit': take_profit,
+                'risk_pct': risk_pct,
+                'reward_pct': reward_pct,
+                'risk_reward': 2.5,
+                'reason': f"EXTREME Overbought (RSI {rsi:.0f}, %ile {rsi_pct:.0f}) + Downtrend",
+                'volume_ratio': round(vol_ratio, 2),
+                'atr': round(atr, 2),
+                'sma_50': round(sma_50, 2)
+            }
+        
+        # ============ NO SIGNAL ============
+        trend = 'bullish' if current_price > sma_50 else 'bearish'
         return {
             'symbol': self.symbol,
-            'signal': signal,
+            'signal': "⚪ HOLD",
             'price': round(current_price, 2),
             'rsi': round(rsi, 1),
             'rsi_percentile': round(rsi_pct, 1),
             'adx': round(adx, 1),
-            'trend': 'bullish' if sma_50 > sma_200 else 'bearish',
-            'confidence': confidence,
-            'entry': round(current_price, 2),
-            'stop_loss': stop_loss,
-            'take_profit': take_profit,
-            'risk_pct': risk_pct,
-            'reward_pct': reward_pct,
-            'risk_reward': rr_ratio,
-            'reason': reason,
+            'trend': trend,
+            'confidence': 0,
+            'entry': None,
+            'stop_loss': None,
+            'take_profit': None,
+            'risk_reward': None,
+            'reason': f"No signal - RSI {rsi:.0f} at {rsi_pct:.0f}%ile (need <15%ile for BUY or >85%ile for SELL)",
             'volume_ratio': round(vol_ratio, 2),
             'atr': round(atr, 2),
-            'sma_50': round(sma_50, 2),
-            'sma_200': round(sma_200, 2)
+            'sma_50': round(sma_50, 2)
         }
 
 

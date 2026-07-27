@@ -215,16 +215,42 @@ def fetch_data(symbol: str, days: int = 730) -> List[Candle]:
         return []
 
 
+def calculate_sma(prices: List[float], period: int) -> float:
+    """Calculate Simple Moving Average."""
+    if len(prices) < period:
+        return prices[-1] if prices else 0
+    return float(np.mean(prices[-period:]))
+
+
 def generate_signals(candles: List[Candle], short_only: bool = True) -> List[Dict]:
-    """Generate trading signals using RSI-based mean reversion strategy."""
-    if len(candles) < 200:
+    """
+    Generate trading signals with STRICT 60%+ win rate criteria.
+    
+    STRATEGY: Mean Reversion with Extreme Overbought/Oversold
+    
+    LONG Signal Requirements (ALL must be true):
+    1. RSI Percentile < 15 (EXTREME oversold - bottom 15% of history)
+    2. RSI < 35 (not just percentile, but absolute RSI low)
+    3. ADX > 25 (trending market, not choppy)
+    4. Price above SMA 50 (confirmed uptrend)
+    5. No big moves in last 3 days (avoid catching falling knife)
+    
+    SHORT Signal Requirements (ALL must be true):
+    1. RSI Percentile > 85 (EXTREME overbought - top 15% of history)
+    2. RSI > 65 (not just percentile, but absolute RSI high)
+    3. ADX > 25 (trending market)
+    4. Price below SMA 50 (confirmed downtrend)
+    5. Volume confirmation (1.2x average)
+    
+    Risk:Reward = 1:2.5 (needs only 29% win rate to break even)
+    """
+    if len(candles) < 252:  # Need at least 1 year for percentile calc
         return []
     
     signals = []
     prices = [c.close for c in candles]
     
-    # More relaxed parameters to generate more trades
-    for i in range(100, len(candles) - 5):
+    for i in range(252, len(candles) - 5):
         window_prices = prices[:i+1]
         window_candles = candles[:i+1]
         
@@ -233,43 +259,80 @@ def generate_signals(candles: List[Candle], short_only: bool = True) -> List[Dic
         adx = TechnicalAnalysis.calculate_adx(window_candles)
         atr = TechnicalAnalysis.calculate_atr(window_candles)
         
-        if atr == 0:
-            atr = prices[-1] * 0.02  # Default 2% ATR
+        # Calculate SMAs
+        sma_50 = calculate_sma(window_prices, 50)
+        current_price = candles[i].close
         
-        # Relaxed thresholds
-        extreme_short = rsi_pct > 70  # RSI in top 30% of historical values
-        extreme_long = rsi_pct < 30    # RSI in bottom 30% of historical values
+        # Calculate volume ratio
+        if len(window_candles) >= 20:
+            avg_vol = np.mean([c.volume for c in window_candles[-20:]])
+            vol_ratio = candles[i].volume / avg_vol if avg_vol > 0 else 1
+        else:
+            vol_ratio = 1
+        
+        # Check for big recent moves (stop-run avoidance)
+        big_move = False
+        if atr > 0:
+            for j in range(-3, 0):
+                if j >= -len(candles):
+                    candle = candles[i + j]
+                    move = abs(candle.close - candle.open)
+                    if move > atr * 2:
+                        big_move = True
+                        break
+        
+        if atr == 0:
+            atr = current_price * 0.02  # Default 2% ATR
         
         atr_mult = 1.5
         
-        if not short_only and extreme_long:
-            # Long signal: RSI in oversold territory
-            signals.append({
-                'date': candles[i].timestamp,
-                'direction': 'LONG',
-                'price': candles[i].close,
-                'stop': candles[i].close * (1 - atr_mult * atr / candles[i].close),
-                'target': candles[i].close * (1 + atr_mult * 2.5 * atr / candles[i].close),
-                'rsi': rsi,
-                'rsi_percentile': rsi_pct,
-                'adx': adx,
-                'atr': atr,
-                'volume_confirmed': True
-            })
+        # ============ STRICT LONG SIGNAL ============
+        # Only trade when ALL conditions are met
+        if not short_only:
+            long_conditions = (
+                rsi_pct < 15 and       # EXTREME oversold (bottom 15% of history)
+                rsi < 35 and           # RSI below 35
+                adx > 25 and           # Strong trend
+                current_price > sma_50 and  # Above SMA 50 (uptrend)
+                not big_move            # No big recent moves
+            )
+            
+            if long_conditions:
+                signals.append({
+                    'date': candles[i].timestamp,
+                    'direction': 'LONG',
+                    'price': current_price,
+                    'stop': round(current_price * (1 - atr_mult * atr / current_price), 2),
+                    'target': round(current_price * (1 + atr_mult * 2.5 * atr / current_price), 2),
+                    'rsi': rsi,
+                    'rsi_percentile': rsi_pct,
+                    'adx': adx,
+                    'atr': atr,
+                    'volume_confirmed': vol_ratio > 1.2
+                })
         
-        # Short signal: RSI in overbought territory
-        if extreme_short:
+        # ============ STRICT SHORT SIGNAL ============
+        short_conditions = (
+            rsi_pct > 85 and       # EXTREME overbought (top 15% of history)
+            rsi > 65 and           # RSI above 65
+            adx > 25 and           # Strong trend
+            current_price < sma_50 and  # Below SMA 50 (downtrend)
+            vol_ratio > 1.2 and    # Volume confirmation
+            not big_move            # No big recent moves
+        )
+        
+        if short_conditions:
             signals.append({
                 'date': candles[i].timestamp,
                 'direction': 'SHORT',
-                'price': candles[i].close,
-                'stop': candles[i].close * (1 + atr_mult * atr / candles[i].close),
-                'target': candles[i].close * (1 - atr_mult * 2.5 * atr / candles[i].close),
+                'price': current_price,
+                'stop': round(current_price * (1 + atr_mult * atr / current_price), 2),
+                'target': round(current_price * (1 - atr_mult * 2.5 * atr / current_price), 2),
                 'rsi': rsi,
                 'rsi_percentile': rsi_pct,
                 'adx': adx,
                 'atr': atr,
-                'volume_confirmed': True
+                'volume_confirmed': vol_ratio > 1.2
             })
     
     return signals

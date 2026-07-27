@@ -1,0 +1,167 @@
+
+================================================================================
+🚀 TOP 100 STOCKS BACKTEST & VALIDATION
+================================================================================
+Strategy: BOTH DIRECTIONS
+Stocks: AAPL, MSFT, NVDA, GOOGL, GOOG, META, AMZN, TSLA, AVGO, ADBE...
+================================================================================
+
+⏳ Running backtests...
+--------------------------------------------------
+  📊 AAPL...   📊 MSFT...   📊 NVDA...   📊 GOOGL...   📊 GOOG...   📊 META...   📊 AMZN...   📊 TSLA...   📊 AVGO...   📊 ADBE... ✅ 214 trades
+  📊 CSCO... ✅ 247 trades
+  📊 ACN... ✅ 254 trades
+  📊 IBM... ✅ 264 trades
+  📊 ORCL... ✅ 292 trades
+  📊 INTC... ✅ 256 trades
+  📊 AMD... ✅ 292 trades
+  📊 QCOM... ✅ 264 trades
+  📊 TXN... ✅ 240 trades
+  📊 NOW... ✅ 269 trades
+  📊 INTU... ✅ 260 trades
+  📊 AMAT... ✅ 247 trades
+  📊 LRCX... ✅ 259 trades
+  📊 MU... ✅ 265 trades
+  📊 KLAC... ✅ 242 trades
+  📊 SNPS... ✅ 286 trades
+  📊 CDNS... ✅ 263 trades
+  📊 PANW... ✅ 314 trades
+  📊 CRWD... ✅ 244 trades
+  📊 FTNT... ✅ 258 trades
+  📊 NET... ✅ 248 trades
+  📊 AMZN... ✅ 254 trades
+  📊 TSLA... ✅ 284 trades
+  📊 HD... ✅ 256 trades
+  📊 MCD... ✅ 239 trades
+  📊 NKE... ✅ 275 trades
+  📊 SBUX... ✅ 263 trades
+  📊 LOW... ✅ 260 trades
+  📊 TJX... ✅ 257 trades
+  📊 BKNG... ✅ 229 trades
+  📊 CMG... ✅ 264 trades
+  📊 MAR... ✅ 269 trades
+  📊 HLT... ✅ 231 trades
+  📊 RCL... ✅ 225 trades
+  📊 CCL... ✅ 231 trades
+  📊 EBAY... ✅ 234 trades
+  📊 YUM... ✅ 254 trades
+  📊 DRI... ✅ 258 trades
+  📊 ROST... ✅ 284 trades
+  📊 DLR... ✅ 235 trades
+  📊 EXPE... ✅ 241 trades
+  📊 JPM... ✅ 245 trades
+  📊 BAC... ✅ 240 trades
+  📊 WFC... ✅ 233 trades
+  📊 GS... ✅ 231 trades
+  📊 MS... ✅ 258 trades
+  📊 C... ✅ 252 trades
+  📊 BLK... ✅ 278 trades
+  📊 AXP... ✅ 269 trades
+  📊 SCHW... ✅ 239 trades
+  📊 USB... ✅ 287 trades
+  📊 TFC... ✅ 230 trades
+  📊 COF... ✅ 246 trades
+  📊 MET... ✅ 286 trades
+  📊 PRU... ✅ 205 trades
+  📊 AON... ✅ 248 trades
+  📊 MMC... ✅ 238 trades
+  📊 CB... ✅ 280 trades
+  📊 TRV... ✅ 216 trades
+  📊 ALL... ✅ 266 trades
+  📊 AIG... ✅ 275 trades
+  📊 UNH... ✅ 268 trades
+  📊 JNJ... ✅ 224 trades
+  📊 LLY... ✅ 263 trades
+  📊 PFE... ✅ 201 trades
+  📊 ABBV... $MMC: possibly delisted; no price data found  (period=730d) (Yahoo error = "No data found, symbol may be delisted")
+❌ Insufficient data
+  📊 MRK... ✅ 232 trades
+  📊 TMO... ✅ 235 trades
+  📊 ABT... ✅ 245 trades
+  📊 DHR... ✅ 240 trades
+  📊 BMY... ✅ 246 trades
+  📊 AMGN... ✅ 245 trades
+  📊 GILD... ✅ 264 trades
+  📊 ISRG... ✅ 244 trades
+  📊 MDT... ✅ 229 trades
+  📊 SYK... ✅ 314 trades
+  📊 BSX... ✅ 261 trades
+  📊 ZTS... ✅ 239 trades
+  📊 REGN... ✅ 305 trades
+  📊 VRTX... ✅ 266 trades
+  📊 BIIB... ✅ 255 trades
+  📊 CAT... ✅ 271 trades
+  📊 BA... ✅ 252 trades
+  📊 HON... ✅ 256 trades
+  📊 UPS... ✅ 232 trades
+  📊 RTX... ✅ 220 trades
+  📊 GE... ✅ 269 trades
+  📊 DE... ✅ 244 trades
+  📊 LMT... ✅ 225 trades
+  📊 MMM... ✅ 248 trades
+  📊 EMR... ✅ 258 trades
+✅ 262 trades
+✅ 292 trades
+✅ 297 trades
+✅ 276 trades
+✅ 251 trades
+✅ 248 trades
+✅ 251 trades
+✅ 279 trades
+✅ 216 trades
+--------------------------------------------------
+
+✅ Completed: 99 | ❌ Failed: 1
+
+================================================================================
+📊 AGGREGATE BACKTEST SUMMARY
+================================================================================
+
+📈 OVERALL STATISTICS
+  Validated Stocks:   97/100
+  Total Trades:       24633
+  Average Win Rate:   32.0%
+  Total P&L:          +13986.33%
+  Avg P&L/Trade:      +0.57%
+
+🔍 VALIDATION RESULTS
+  ✅ PASS:             0 stocks (0.0%)
+  ⚠️  MARGINAL:        1 stocks (1.0%)
+  ❌ FAIL:             96 stocks (99.0%)
+
+🏆 TOP 10 PERFORMING STOCKS
+Symbol     Trades   Win Rate     P&L          Validation
+------------------------------------------------------------
+NET        257      37.7%       +869.7%      ❌ FAIL
+GE         251      42.2%       +687.5%      ❌ FAIL
+EXPE       239      37.7%       +671.7%      ❌ FAIL
+ALL        245      52.2%       +667.2%      ⚠️ MARGINAL
+C          286      37.8%       +623.0%      ❌ FAIL
+MMM        279      43.7%       +600.8%      ❌ FAIL
+INTC       263      39.2%       +570.2%      ❌ FAIL
+TFC        268      40.7%       +551.5%      ❌ FAIL
+EBAY       231      42.0%       +526.7%      ❌ FAIL
+AMZN       264      41.3%       +525.8%      ❌ FAIL
+
+📉 BOTTOM 10 PERFORMING STOCKS
+Symbol     Trades   Win Rate     P&L          Validation
+------------------------------------------------------------
+MSFT       247      21.1%       -224.2%      ❌ FAIL
+REGN       244      21.3%       -228.9%      ❌ FAIL
+BIIB       248      23.8%       -231.9%      ❌ FAIL
+NVDA       214      22.4%       -238.8%      ❌ FAIL
+AMAT       248      23.0%       -301.7%      ❌ FAIL
+ORCL       259      24.3%       -316.2%      ❌ FAIL
+BSX        269      25.3%       -332.6%      ❌ FAIL
+GOOG       292      19.2%       -402.9%      ❌ FAIL
+TMO        314      18.8%       -409.5%      ❌ FAIL
+GOOGL      292      18.8%       -422.8%      ❌ FAIL
+
+================================================================================
+🎯 OVERALL STRATEGY VALIDATION: ✅ MARGINAL
+================================================================================
+⚠️  Strategy shows mixed results
+   - May need parameter tuning per stock type
+   - Consider sector-specific strategies
+
+📁 Results saved to: backtest_results_20260727_002917.json
